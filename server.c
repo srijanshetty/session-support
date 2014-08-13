@@ -9,6 +9,9 @@
 // Related to threading
 #include<pthread.h>
 
+// Constants
+#define PORT 8000
+
 void *connection_handler(void *);
 
 int main(int argc, char *argv[]) {
@@ -19,21 +22,20 @@ int main(int argc, char *argv[]) {
         perror("[FAIL] Socket creation failed");
         return 1;
     }
-    puts("[OKAY] Socket creation succeded");
 
     // Bind the socket to the port
     struct sockaddr_in server;
 
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_family = AF_INET;
-    server.sin_port = htons(8000);
+    server.sin_port = htons(PORT);
     if ( bind(socket_desc, (struct sockaddr *) &server, sizeof(server)) < 0 ) {
         perror("[FAIL] Bind failed");
     }
-    puts("[OKAY] Bind succeded");
 
     // Listen for connections
     listen(socket_desc, 3);
+    printf("[OKAY] Listening for connections on port %d\n", PORT);
 
     // Now we accept connections
     struct sockaddr_in client;
@@ -43,7 +45,7 @@ int main(int argc, char *argv[]) {
     puts("[OKAY] Waiting for connections");
     c = sizeof(struct sockaddr_in);
     while ( (new_socket = accept( socket_desc, (struct sockaddr *) & client, (socklen_t *) &c)) ) {
-        puts("[OKAY] Connection Accepted");
+        puts("\n[OKAY] Connection Accepted");
         message = "HELO\n";
         write(new_socket, message, strlen(message));
 
@@ -77,10 +79,13 @@ void *connection_handler( void *sock ) {
 
     // Send message to the client
     message = "FIN\n";
+
     write(socket_desc, message, strlen(message));
 
     // Free the space which was allocated to the socket
     free(sock);
+
+    puts("[OKAY] Closing connection");
 
     return 0;
 }
