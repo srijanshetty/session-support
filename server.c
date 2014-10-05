@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     puts("[OKAY] Waiting for connections");
     c = sizeof(struct sockaddr_in);
-    while ( (new_socket = accept( socket_desc, (struct sockaddr *) & client, (socklen_t *) &c)) ) {
+    while ( (new_socket = accept( socket_desc, (struct sockaddr *) & client, &c)) ) {
         puts("\n[OKAY] Connection Accepted");
         message = "HELO\n";
         write(new_socket, message, strlen(message));
